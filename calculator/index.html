@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Калькулятор займа</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #0f1f2e;
+      --bg1: #16324a;
+      --card: rgba(255, 255, 255, 0.94);
+      --text: #142033;
+      --muted: #5b6b7c;
+      --accent: #1f8f6e;
+      --accent-dark: #167358;
+      --line: #d7e0ea;
+      --warn: #9a6b16;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Manrope, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 0%, #2a6f8f 0%, transparent 55%),
+        radial-gradient(ellipse 70% 45% at 100% 100%, #1a4d3c 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+      padding: 24px 16px 40px;
+    }
+
+    .wrap {
+      width: min(440px, 100%);
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 8px 0 6px;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #f4f8fb;
+      letter-spacing: -0.02em;
+    }
+
+    .lead {
+      margin: 0 0 20px;
+      color: #b7c7d6;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 22px 20px 20px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .field { margin-bottom: 18px; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="number"],
+    input[type="range"],
+    select {
+      width: 100%;
+      font: inherit;
+    }
+
+    input[type="number"],
+    select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #7eb9a3;
+      box-shadow: 0 0 0 3px rgba(31, 143, 110, 0.15);
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+    }
+
+    .value {
+      min-width: 7.5rem;
+      text-align: right;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 12px 10px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: #e7f6f0;
+      border-color: #9fd0bc;
+      color: var(--accent-dark);
+    }
+
+    .rate-box[hidden] { display: none; }
+
+    .result {
+      margin-top: 8px;
+      padding: 16px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #eef8f4, #f6fafc);
+      border: 1px solid #d5ebe2;
+    }
+
+    .result .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 6px 0;
+      font-size: 0.95rem;
+    }
+
+    .result .total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #c5d9cf;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: var(--warn);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Калькулятор займа</h1>
+    <p class="lead">Ориентировочный расчёт. Точные условия зависят от вашей ситуации.</p>
+
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" id="tabFirst" data-mode="first">Первый займ</button>
+        <button type="button" class="tab" id="tabRepeat" data-mode="repeat">Повторный</button>
+      </div>
+
+      <div class="field">
+        <label for="amount">Сумма, ₽</label>
+        <div class="row">
+          <input id="amountRange" type="range" min="3000" max="100000" step="1000" value="30000" />
+          <div class="value" id="amountLabel">30&nbsp;000</div>
+        </div>
+        <input id="amount" type="number" min="3000" max="100000" step="1000" value="30000" />
+      </div>
+
+      <div class="field">
+        <label for="days">Срок, дней</label>
+        <div class="row">
+          <input id="daysRange" type="range" min="7" max="30" step="1" value="14" />
+          <div class="value" id="daysLabel">14</div>
+        </div>
+      </div>
+
+      <div class="field rate-box" id="rateBox" hidden>
+        <label for="dailyRate">Ставка, % в день</label>
+        <input id="dailyRate" type="number" min="0" max="5" step="0.1" value="0.4" />
+      </div>
+
+      <div class="result" id="result" aria-live="polite"></div>
+      <p class="note">Это предварительный ориентир, не оферта. Финальные условия смотрите при оформлении.</p>
+    </div>
+  </div>
+
+  <script>
+    const money = (n) =>
+      new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(Math.round(n));
+
+    const amount = document.getElementById("amount");
+    const amountRange = document.getElementById("amountRange");
+    const amountLabel = document.getElementById("amountLabel");
+    const daysRange = document.getElementById("daysRange");
+    const daysLabel = document.getElementById("daysLabel");
+    const dailyRate = document.getElementById("dailyRate");
+    const rateBox = document.getElementById("rateBox");
+    const result = document.getElementById("result");
+    const tabs = document.querySelectorAll(".tab");
+
+    let mode = "first";
+
+    function clampAmount(v) {
+      return Math.min(100000, Math.max(3000, Number(v) || 3000));
+    }
+
+    function syncAmount(v) {
+      const n = clampAmount(v);
+      amount.value = n;
+      amountRange.value = n;
+      amountLabel.innerHTML = money(n).replace(/\s/g, "&nbsp;");
+    }
+
+    function calc() {
+      const sum = clampAmount(amount.value);
+      const days = Number(daysRange.value);
+      daysLabel.textContent = String(days);
+
+      let rate = 0;
+      let title = "Первый займ (обычно 0%)";
+
+      if (mode === "repeat") {
+        rate = Number(dailyRate.value) || 0;
+        title = `Повторный · ${rate}% в день`;
+      }
+
+      const interest = sum * (rate / 100) * days;
+      const total = sum + interest;
+
+      result.innerHTML = `
+        <div class="line"><span>${title}</span><span></span></div>
+        <div class="line"><span>Сумма</span><span>${money(sum)} ₽</span></div>
+        <div class="line"><span>Срок</span><span>${days} дн.</span></div>
+        <div class="line"><span>Переплата</span><span>${money(interest)} ₽</span></div>
+        <div class="line total"><span>К возврату</span><span>${money(total)} ₽</span></div>
+      `;
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        mode = tab.dataset.mode;
+        rateBox.hidden = mode !== "repeat";
+        calc();
+      });
+    });
+
+    amountRange.addEventListener("input", () => {
+      syncAmount(amountRange.value);
+      calc();
+    });
+    amount.addEventListener("input", () => {
+      syncAmount(amount.value);
+      calc();
+    });
+    daysRange.addEventListener("input", calc);
+    dailyRate.addEventListener("input", calc);
+
+    syncAmount(30000);
+    calc();
+  </script>
+</body>
+</html>
